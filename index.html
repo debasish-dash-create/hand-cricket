@@ -6,6 +6,7 @@
     <title>Neon Hand Cricket</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --neon-blue: #0ff;
@@ -62,38 +63,46 @@
         .hex-wrapper.disabled { pointer-events: none; filter: drop-shadow(0 0 2px #555); }
         .hex-wrapper.disabled .hex-button { color: #555; border-color: #555; text-shadow: none; }
 
-        /* Holo Outline Hand CSS */
+        /* SVG Hand Icons */
         .hand-icon {
-            font-size: 4.5rem;
+            width: 80px;
+            height: 80px;
             display: inline-block;
-            transform-origin: center bottom; /* Pivots from the wrist */
+            transform-origin: center center;
             transition: all 0.1s ease;
         }
         
-        .holo-p1 {
-            -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 3px var(--neon-blue);
-            filter: drop-shadow(0 0 10px var(--neon-blue));
+        .hand-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .holo-p1 svg {
+            fill: none;
+            stroke: var(--neon-blue);
+            stroke-width: 2;
+            filter: drop-shadow(0 0 8px var(--neon-blue));
         }
 
-        .holo-p2 {
-            -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 3px var(--neon-pink);
-            filter: drop-shadow(0 0 10px var(--neon-pink));
+        .holo-p2 svg {
+            fill: none;
+            stroke: var(--neon-pink);
+            stroke-width: 2;
+            filter: drop-shadow(0 0 8px var(--neon-pink));
         }
 
         /* Face each other */
-        .face-right { transform: rotate(90deg); }
-        .face-left { transform: scaleX(-1) rotate(90deg); }
+        .face-right { transform: rotate(0deg); }
+        .face-left { transform: scaleX(-1); }
 
         /* Wrist Shake Animations */
         @keyframes wristShakeRight {
-            0%, 100% { transform: rotate(90deg); }
-            50% { transform: rotate(115deg); } 
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(15deg); } 
         }
         @keyframes wristShakeLeft {
-            0%, 100% { transform: scaleX(-1) rotate(90deg); }
-            50% { transform: scaleX(-1) rotate(115deg); }
+            0%, 100% { transform: scaleX(-1) rotate(0deg); }
+            50% { transform: scaleX(-1) rotate(15deg); }
         }
 
         .shaking-p1 { animation: wristShakeRight 0.3s infinite ease-in-out; }
@@ -111,8 +120,12 @@
         @keyframes pulse-green { 0% { box-shadow: inset 0 0 0px var(--neon-green); } 50% { box-shadow: inset 0 0 50px var(--neon-green); } 100% { box-shadow: inset 0 0 0px var(--neon-green); } }
         @keyframes pulse-red { 0% { box-shadow: inset 0 0 0px var(--neon-red); } 50% { box-shadow: inset 0 0 100px var(--neon-red); } 100% { box-shadow: inset 0 0 0px var(--neon-red); } }
         @keyframes flash-yellow { 0%, 100% { border-color: transparent; } 50% { border-color: var(--neon-yellow); box-shadow: 0 0 20px var(--neon-yellow) inset; } }
+        /* FIX #1: Added missing anim-6 animation for hitting a six */
+        @keyframes pulse-blue { 0% { box-shadow: inset 0 0 0px var(--neon-blue); } 50% { box-shadow: inset 0 0 80px var(--neon-blue); } 100% { box-shadow: inset 0 0 0px var(--neon-blue); } }
+        
         .anim-1 { animation: pulse-green 0.5s ease-out; }
         .anim-4 { animation: flash-yellow 1s infinite; border: 4px solid transparent; }
+        .anim-6 { animation: pulse-blue 0.8s ease-out; } /* FIX #1: Now anim-6 exists */
         .anim-out { animation: pulse-red 0.8s ease-out; }
 
         @keyframes slideText { 0% { transform: translateX(-150%) skewX(-20deg); opacity: 0; } 20% { transform: translateX(0) skewX(0deg); opacity: 1; } 80% { transform: translateX(0) skewX(0deg); opacity: 1; } 100% { transform: translateX(150%) skewX(20deg); opacity: 0; } }
@@ -120,6 +133,8 @@
 
         .text-glow-blue { text-shadow: 0 0 10px var(--neon-blue); color: var(--neon-blue); }
         .text-glow-pink { text-shadow: 0 0 10px var(--neon-pink); color: var(--neon-pink); }
+        /* FIX #2: Added missing text-glow-green class */
+        .text-glow-green { text-shadow: 0 0 10px var(--neon-green); color: var(--neon-green); }
         
         .coin-container { perspective: 1000px; width: 120px; height: 120px; margin: 0 auto 3rem auto; }
         .coin-3d { width: 100%; height: 100%; position: relative; transition: transform 2s; transform-style: preserve-3d; }
@@ -134,7 +149,7 @@
         @keyframes coinFlipAnim { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(1800deg); } }
         .coin-animating { animation: coinFlipAnim 2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 
-        .screen { display: none; width: 100%; height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; }
+        .screen { display: none; width: 100%; height: 100vh; height: 100dvh; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; box-sizing: border-box; overflow: hidden; }
         .active-screen { display: flex; }
         .timer-bar { height: 8px; background: var(--neon-blue); width: 100%; transition: width 0.1s linear; }
 
@@ -157,23 +172,51 @@
         #action-arena {
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Pushes elements to top, middle, and bottom of arena */
-            padding: 20px 0;
-            height: 35vh; /* Gives the hands a dedicated area that doesn't collapse */
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+            flex: 1;
+            min-height: 0;
         }
         /* Ensure hexagons don't overflow */
         #controls-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(3, auto);
+            gap: 8px;
+            justify-content: center;
             padding: 0 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
         }
+        
+        /* Game screen specific layout */
+        #screen-game {
+            justify-content: flex-start;
+            padding-top: 10px;
+            padding-bottom: env(safe-area-inset-bottom, 10px);
+            gap: 5px;
+        }
+        
         /* Mobile specific adjustments */
         @media (max-height: 700px) {
-            .hand-icon { font-size: 3.5rem; }
-            #action-arena { height: 30vh; }
-            .hex-button { width: 50px; height: 60px; font-size: 1rem; }
+            .hand-icon { width: 55px; height: 55px; }
+            #action-arena { padding: 5px 0; }
+            .hex-button { width: 48px; height: 56px; font-size: 1rem; }
+            #controls-grid { gap: 6px; margin-bottom: 8px; }
+            #vs-text { font-size: 1rem; margin-top: 10px; }
+        }
+        
+        @media (max-height: 600px) {
+            .hand-icon { width: 45px; height: 45px; }
+            .hex-button { width: 42px; height: 50px; font-size: 0.85rem; }
+            #controls-grid { gap: 4px; margin-bottom: 5px; }
+            #vs-text { font-size: 0.8rem; margin-top: 5px; }
+            .timer-bar { height: 6px; }
+        }
+        
+        @media (max-width: 380px) {
+            .hand-icon { width: 45px; height: 45px; }
+            .hex-button { width: 42px; height: 50px; font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -193,9 +236,9 @@
     </div>
 
     <div id="screen-rules" class="screen bg-black/80 backdrop-blur-sm">
-        <h2 class="text-2xl text-glow-blue mb-6">RULES OF ENGAGEMENT</h2>
-        <div class="w-full max-w-md border-2 border-cyan-400 p-6 shadow-[0_0_15px_#0ff] mb-8 text-xs leading-relaxed text-gray-200">
-            <ul class="list-disc pl-4 space-y-4">
+        <h2 class="text-xl sm:text-2xl text-glow-blue mb-4 flex-shrink-0">RULES OF ENGAGEMENT</h2>
+        <div class="w-full max-w-md border-2 border-cyan-400 p-4 sm:p-6 shadow-[0_0_15px_#0ff] mb-4 text-xs leading-relaxed text-gray-200 overflow-y-auto max-h-[55vh] flex-shrink">
+            <ul class="list-disc pl-4 space-y-3">
                 <li><span class="text-glow-pink">THE TOSS:</span> A coin flip decides who bats or bowls. (Synced online).</li>
                 <li><span class="text-glow-pink">THE CLOCK:</span> You have exactly <span class="text-red-500">3 SECONDS</span> to select a number (1-6).</li>
                 <li><span class="text-glow-pink">AFK PENALTY:</span> Miss the timer? It's a dot ball (0). 3 consecutive misses = OUT!</li>
@@ -203,7 +246,7 @@
                 <li><span class="text-glow-pink">WICKETS:</span> 1 wicket match! If numbers match, batsman is OUT.</li>
             </ul>
         </div>
-        <div class="flex gap-4 w-full max-w-md">
+        <div class="flex gap-4 w-full max-w-md flex-shrink-0 mt-auto">
             <button onclick="acceptRules()" class="flex-1 p-3 bg-cyan-500 text-black font-bold uppercase text-xs hover:bg-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.8)]">Understood & Play</button>
         </div>
     </div>
@@ -211,6 +254,8 @@
     <div id="screen-loading" class="screen">
         <h2 class="text-2xl text-glow-blue animate-pulse mb-4 text-center">SEARCHING FOR<br>OPPONENT...</h2>
         <div class="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin shadow-[0_0_15px_#0ff]"></div>
+        <!-- FIX #6: Added cancel button for online matchmaking -->
+        <button onclick="cancelMatchmaking()" class="mt-8 p-3 border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-black transition uppercase text-xs">Cancel</button>
     </div>
 
     <div id="screen-mode" class="screen">
@@ -248,18 +293,18 @@
         </div>
     </div>
 
-    <div id="screen-game" class="screen justify-between py-6">
+    <div id="screen-game" class="screen">
         <!-- HUD -->
-        <div class="w-full max-w-md flex justify-between items-start bg-black/80 border border-gray-800 p-3 rounded shadow-[0_0_20px_rgba(0,0,0,0.8)]">
+        <div class="w-full max-w-md flex justify-between items-start bg-black/80 border border-gray-800 p-2 rounded shadow-[0_0_20px_rgba(0,0,0,0.8)] flex-shrink-0">
             <div>
                 <p class="text-[10px] text-gray-400 mb-1" id="hud-name-you">YOU (0)</p>
                 <p class="text-[10px] text-gray-400" id="hud-name-opp">CPU (0)</p>
-                <p class="text-[10px] text-gray-400 mt-2">OVERS: <span class="text-white" id="hud-overs">0.0</span></p>
+                <p class="text-[10px] text-gray-400 mt-1">OVERS: <span class="text-white" id="hud-overs">0.0</span></p>
             </div>
             <div class="text-right">
                 <p class="text-[10px] text-gray-400">ROLE</p>
                 <p class="text-sm text-glow-pink" id="hud-role">BATTING</p>
-                <p class="text-[10px] text-gray-400 mt-2 hidden" id="hud-target-box">TARGET: <span class="text-yellow-400" id="hud-target">0</span></p>
+                <p class="text-[10px] text-gray-400 mt-1 hidden" id="hud-target-box">TARGET: <span class="text-yellow-400" id="hud-target">0</span></p>
             </div>
         </div>
 
@@ -287,7 +332,7 @@
                 </div>
             </div>
             
-            <div id="afk-warnings" class="mt-8 flex gap-2 hidden">
+            <div id="afk-warnings" class="mt-4 flex gap-2 hidden">
                 <div class="w-3 h-3 rounded-full bg-red-900 border border-red-500" id="afk-1"></div>
                 <div class="w-3 h-3 rounded-full bg-red-900 border border-red-500" id="afk-2"></div>
                 <div class="w-3 h-3 rounded-full bg-red-900 border border-red-500" id="afk-3"></div>
@@ -296,11 +341,11 @@
         </div>
 
         <!-- Bottom Controls -->
-        <div class="w-full max-w-md">
-            <div class="w-full bg-gray-900 h-2 mb-4 border border-gray-700">
+        <div class="w-full max-w-md flex-shrink-0 pb-2">
+            <div class="w-full bg-gray-900 h-2 mb-3 border border-gray-700">
                 <div id="turn-timer-bar" class="timer-bar w-full"></div>
             </div>
-            <div class="grid grid-cols-3 gap-y-6 gap-x-2 place-items-center" id="controls-grid">
+            <div id="controls-grid">
                 <!-- Hexagons generated by JS -->
             </div>
         </div>
@@ -337,6 +382,8 @@
         let isOnlineMode = false;
         let socket;
         let myPlayerId;
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 3;
         
         let myName = "";
         let oppName = "CPU";
@@ -349,20 +396,51 @@
         let timers = { toss: null, turn: null, superOver: null };
         let isAnimating = false;
 
-        // Hand Mapping Array (4 is now Vulcan salute)
+        // SVG Hand Icons - Cross-platform compatible (works on iOS Safari)
         const hands = {
-            0: "✊",
-            1: "☝️",
-            2: "✌️",
-            3: "🤟",
-            4: "🖖",
-            5: "🖐️",
-            6: "👍"
+            0: `<svg viewBox="0 0 64 64"><path d="M32 56c-8 0-14-6-14-14V26c0-2 2-4 4-4s4 2 4 4v8h4V18c0-2 2-4 4-4s4 2 4 4v16h4V20c0-2 2-4 4-4s4 2 4 4v14h4V24c0-2 2-4 4-4s4 2 4 4v18c0 8-6 14-14 14h-12z"/></svg>`, // Fist
+            1: `<svg viewBox="0 0 64 64"><path d="M32 8v20M32 8c-2 0-4 1-4 3v12h8V11c0-2-2-3-4-3zM18 42c0 8 6 14 14 14h12c8 0 14-6 14-14V24c0-2-2-4-4-4s-4 2-4 4v10h-4V20c0-2-2-4-4-4s-4 2-4 4v14h-4V18c0-2-2-4-4-4s-4 2-4 4v24z"/></svg>`, // 1 finger
+            2: `<svg viewBox="0 0 64 64"><path d="M24 8v22M36 8v22M24 8c-2 0-4 1-4 3v19M36 8c-2 0-4 1-4 3v19M40 30c2 0 4 2 4 4M18 42c0 8 6 14 14 14h12c8 0 14-6 14-14V34c0-2-2-4-4-4h-6V20c0-2-2-4-4-4s-4 2-4 4v10h-4V11c0-2-2-3-4-3s-4 1-4 3v19h-4V11c0-2-2-3-4-3s-4 1-4 3v31z"/></svg>`, // 2 fingers (peace)
+            3: `<svg viewBox="0 0 64 64"><path d="M20 12v18M32 8v22M44 12v18M20 12c-2 0-4 1-4 3v27c0 8 6 14 14 14h4c8 0 14-6 14-14V15c0-2-2-3-4-3s-4 1-4 3v15h-4V11c0-2-2-3-4-3s-4 1-4 3v19h-4V15c0-2-2-3-4-3z"/></svg>`, // 3 fingers
+            4: `<svg viewBox="0 0 64 64"><path d="M16 14v16M26 10v20M38 10v20M50 14v16M16 14c-2 0-4 1-4 3v25c0 8 6 14 14 14h12c8 0 14-6 14-14V17c0-2-2-3-4-3s-4 1-4 3v13h-4V13c0-2-2-3-4-3s-4 1-4 3v17h-4V13c0-2-2-3-4-3s-4 1-4 3v17h-4V17c0-2-2-3-4-3z"/></svg>`, // 4 fingers
+            5: `<svg viewBox="0 0 64 64"><path d="M12 28l8-6M16 22v-8c0-2 2-3 4-3s4 1 4 3v16M28 10v20M40 10v20M52 14v16M28 10c-2 0-4 1-4 3v17h-4V14c0-2-2-3-4-3M40 10c-2 0-4 1-4 3v17h-4V13c0-2-2-3-4-3M52 14c-2 0-4 1-4 3v13h-4V13c0-2-2-3-4-3M12 42c0 8 6 14 14 14h12c8 0 14-6 14-14V17c0-2-2-3-4-3"/></svg>`, // 5 fingers (open palm)
+            6: `<svg viewBox="0 0 64 64"><path d="M32 56c-8 0-14-6-14-14V26c0-2 2-4 4-4s4 2 4 4v8h4V18c0-2 2-4 4-4s4 2 4 4v16h4V20c0-2 2-4 4-4s4 2 4 4v14h4V24c0-2 2-4 4-4s4 2 4 4v18c0 8-6 14-14 14h-12zM22 40v8M22 48l6-3"/></svg>` // Thumbs up
         };
 
+        // FIX #5: Clear all timers helper function
+        function clearAllTimers() {
+            if (timers.toss) {
+                clearInterval(timers.toss);
+                timers.toss = null;
+            }
+            if (timers.turn) {
+                clearInterval(timers.turn);
+                timers.turn = null;
+            }
+            if (timers.superOver) {
+                clearInterval(timers.superOver);
+                timers.superOver = null;
+            }
+        }
+
         function showScreen(id) {
+            // FIX #5: Clear timers when transitioning screens to prevent memory leaks
+            if (id === 'screen-menu') {
+                clearAllTimers();
+                resetGameState();
+            }
             screens.forEach(s => s.classList.remove('active-screen'));
             document.getElementById(id).classList.add('active-screen');
+        }
+
+        // FIX #5: Reset game state helper
+        function resetGameState() {
+            gameState = {
+                totalOvers: 1, maxBalls: 6, innings: 1, playerRole: 'bat', 
+                scores: { player: 0, cpu: 0 }, balls: 0, target: null, afkStrikes: 0
+            };
+            isAnimating = false;
+            reconnectAttempts = 0;
         }
 
         function showToast(msg) {
@@ -382,20 +460,52 @@
 
         function acceptRules() {
             if (selectedGameMode === 'online') {
-                connectToPvP();
+                connectToServer();
             } else {
-                if (!myName) myName = "PLAYER 1";
                 oppName = "CPU";
                 document.getElementById('opp-label').innerText = oppName;
                 document.getElementById('res-name-opp').innerText = oppName;
-                isOnlineMode = false;
-                showScreen('screen-mode'); 
+                showScreen('screen-mode');
             }
         }
 
-        function connectToPvP() {
+        // FIX #6: Cancel matchmaking function
+        function cancelMatchmaking() {
+            isIntentionalDisconnect = true;
+            if (socket) {
+                socket.close();
+            }
+            showScreen('screen-menu');
+            showToast("Matchmaking cancelled");
+        }
+
+        function connectToServer() {
             showScreen('screen-loading');
-            socket = new WebSocket(`wss://hand-cricket-api.onrender.com/ws/pvp?name=${encodeURIComponent(myName)}`);
+            
+            // WebSocket server URL - endpoint is /ws/pvp with name as query param
+            const playerName = myName || "Guest";
+            const wsUrl = `wss://hand-cricket-api.onrender.com/ws/pvp?name=${encodeURIComponent(playerName)}`;
+            
+            try {
+                socket = new WebSocket(wsUrl);
+            } catch (e) {
+                showToast("Failed to connect to server");
+                setTimeout(() => showScreen('screen-menu'), 2000);
+                return;
+            }
+            
+            socket.onopen = function() {
+                reconnectAttempts = 0;
+                // Server handles queue automatically on connection, no need to send join_queue
+            };
+
+            socket.onerror = function(error) {
+                console.error("WebSocket error:", error);
+                // FIX #6: Don't show error if intentionally disconnecting
+                if (!isIntentionalDisconnect) {
+                    showToast("Connection error. Please try again.");
+                }
+            };
 
             socket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
@@ -436,16 +546,49 @@
                     const myMove = myPlayerId === "p1" ? data.p1_move.move : data.p2_move.move;
                     const oppMove = myPlayerId === "p1" ? data.p2_move.move : data.p1_move.move;
                     
+                    // FIX #3: Handle AFK strikes from server in online mode
+                    if (data.afk_strikes !== undefined) {
+                        gameState.afkStrikes = data.afk_strikes;
+                        updateAFKUI();
+                    }
+                    
                     // Stop opponent shaking, reveal number
-                    revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left">${hands[oppMove]}</div>`;
+                    revCpu.innerHTML = getHandIcon(oppMove, 'holo-p2', 'face-left');
                     setTimeout(() => resolveMove(myMove, oppMove), 800);
+                }
+                // FIX #3: Handle server-side AFK OUT event
+                else if (data.type === "afk_out") {
+                    const outPlayer = data.player_id;
+                    if (outPlayer === myPlayerId && gameState.playerRole === 'bat') {
+                        triggerAnimation('OUT!', 'out');
+                        setTimeout(() => handleWicket(), 1500);
+                    } else if (outPlayer !== myPlayerId && gameState.playerRole === 'bowl') {
+                        triggerAnimation('OUT!', 'out');
+                        setTimeout(() => handleWicket(), 1500);
+                    }
+                }
+                // FIX #6: Handle opponent disconnect
+                else if (data.type === "opponent_disconnected") {
+                    showToast("Opponent disconnected. You win!");
+                    setTimeout(() => endMatch('player'), 1500);
                 }
             };
 
             socket.onclose = function() {
                 if (!isIntentionalDisconnect) {
-                    showToast("Connection to server lost.");
-                    setTimeout(() => showScreen('screen-menu'), 2000);
+                    // FIX #6: Attempt to reconnect
+                    if (isOnlineMode && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                        reconnectAttempts++;
+                        showToast(`Connection lost. Reconnecting (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+                        setTimeout(() => {
+                            if (!isIntentionalDisconnect) {
+                                connectToServer();
+                            }
+                        }, 2000);
+                    } else {
+                        showToast("Connection to server lost.");
+                        setTimeout(() => showScreen('screen-menu'), 2000);
+                    }
                 }
                 isOnlineMode = false;
                 isIntentionalDisconnect = false;
@@ -535,18 +678,24 @@
             let timeLeft = 5000;
             const bar = document.getElementById('toss-timer-bar');
             bar.style.width = '100%';
+            // FIX #5: Clear existing timer before starting new one
+            if (timers.toss) clearInterval(timers.toss);
             timers.toss = setInterval(() => {
                 timeLeft -= 50;
                 bar.style.width = (timeLeft / 5000) * 100 + '%';
                 if (timeLeft <= 0) {
                     clearInterval(timers.toss);
+                    timers.toss = null;
                     handleTossChoice('bat'); 
                 }
             }, 50);
         }
 
         function handleTossChoice(role) {
-            clearInterval(timers.toss);
+            if (timers.toss) {
+                clearInterval(timers.toss);
+                timers.toss = null;
+            }
             document.getElementById('toss-buttons').classList.add('hidden');
             document.getElementById('toss-timer-container').classList.add('hidden');
             
@@ -585,21 +734,27 @@
             wrappers.forEach(w => disabled ? w.classList.add('disabled') : w.classList.remove('disabled'));
         }
 
+        // Helper to create hand icon HTML
+        function getHandIcon(num, playerClass, faceClass, extraClass = '') {
+            return `<div class="hand-icon ${playerClass} ${faceClass} ${extraClass}">${hands[num]}</div>`;
+        }
+
         function startTurnTimer() {
             if(isAnimating) return;
             setControlsDisabled(false);
             
             // Show the shaking closed fists immediately
             moveReveal.style.opacity = 1;
-            revPlayer.innerHTML = `<div class="hand-icon holo-p1 face-right shaking-p1">${hands[0]}</div>`;
-            revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left shaking-p2">${hands[0]}</div>`;
+            revPlayer.innerHTML = getHandIcon(0, 'holo-p1', 'face-right', 'shaking-p1');
+            revCpu.innerHTML = getHandIcon(0, 'holo-p2', 'face-left', 'shaking-p2');
             
             let timeLeft = 3000;
             const bar = document.getElementById('turn-timer-bar');
             bar.style.width = '100%';
             bar.style.backgroundColor = 'var(--neon-blue)';
             
-            clearInterval(timers.turn);
+            // FIX #5: Clear existing timer before starting new one
+            if (timers.turn) clearInterval(timers.turn);
             timers.turn = setInterval(() => {
                 timeLeft -= 50;
                 bar.style.width = (timeLeft / 3000) * 100 + '%';
@@ -607,6 +762,7 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(timers.turn);
+                    timers.turn = null;
                     handleAFK();
                 }
             }, 50);
@@ -614,23 +770,26 @@
 
         function makeMove(playerNum) {
             if(isAnimating) return;
-            clearInterval(timers.turn);
+            if (timers.turn) {
+                clearInterval(timers.turn);
+                timers.turn = null;
+            }
             setControlsDisabled(true);
             gameState.afkStrikes = 0; 
             updateAFKUI();
             
             // Stop player shaking, reveal number
-            revPlayer.innerHTML = `<div class="hand-icon holo-p1 face-right">${hands[playerNum]}</div>`;
+            revPlayer.innerHTML = getHandIcon(playerNum, 'holo-p1', 'face-right');
             isAnimating = true;
 
             if (isOnlineMode) {
                 // Online: CPU fist pulses while waiting
-                revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left shaking-p2 animate-pulse">${hands[0]}</div>`;
+                revCpu.innerHTML = getHandIcon(0, 'holo-p2', 'face-left', 'shaking-p2 animate-pulse');
                 sendMessageToServer("move", { move: playerNum });
             } else {
                 // Offline: Instantly reveal CPU
                 const cpuNum = Math.floor(Math.random() * 6) + 1;
-                revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left">${hands[cpuNum]}</div>`;
+                revCpu.innerHTML = getHandIcon(cpuNum, 'holo-p2', 'face-left');
                 setTimeout(() => resolveMove(playerNum, cpuNum), 800);
             }
         }
@@ -641,16 +800,17 @@
             updateAFKUI();
             
             const autoNum = Math.floor(Math.random() * 6) + 1;
-            revPlayer.innerHTML = `<div class="hand-icon holo-p1 face-right">${hands[autoNum]}</div>`;
+            revPlayer.innerHTML = getHandIcon(autoNum, 'holo-p1', 'face-right');
             isAnimating = true;
             
             if (isOnlineMode) {
                 showToast("TIMER MISSED! AUTO-PLAYING " + autoNum);
-                revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left shaking-p2 animate-pulse">${hands[0]}</div>`;
-                sendMessageToServer("move", { move: autoNum }); 
+                revCpu.innerHTML = getHandIcon(0, 'holo-p2', 'face-left', 'shaking-p2 animate-pulse');
+                // FIX #3: Send AFK strike count to server for tracking
+                sendMessageToServer("move", { move: autoNum, afk: true, afk_strikes: gameState.afkStrikes }); 
             } else {
                 const cpuNum = Math.floor(Math.random() * 6) + 1;
-                revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left">${hands[cpuNum]}</div>`;
+                revCpu.innerHTML = getHandIcon(cpuNum, 'holo-p2', 'face-left');
                 
                 if(gameState.playerRole === 'bat') {
                     if(gameState.afkStrikes >= 3) {
@@ -659,12 +819,15 @@
                     } else {
                         gameState.balls++;
                         triggerAnimation('DOT BALL', 'normal');
-                        setTimeout(() => resolveTurnUI(0, 0, true), 1500);
+                        // FIX #4: Corrected resolveTurnUI call - pass (runs, isMatch, continueMatch)
+                        setTimeout(() => resolveTurnUI(0, false, true), 1500);
                     }
                 } else {
+                    // Player is bowling, CPU is batting
                     gameState.balls++;
                     gameState.scores.cpu += cpuNum;
                     triggerAnimation(`+${cpuNum}`, 'normal');
+                    // FIX #4: Corrected resolveTurnUI call - pass (runs, isMatch, continueMatch)
                     setTimeout(() => resolveTurnUI(cpuNum, false, true), 1500);
                 }
             }
@@ -673,8 +836,13 @@
         function updateAFKUI() {
             const container = document.getElementById('afk-warnings');
             const text = document.getElementById('afk-text');
-            container.classList.remove('hidden');
-            text.classList.remove('hidden');
+            if (gameState.afkStrikes > 0) {
+                container.classList.remove('hidden');
+                text.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+                text.classList.add('hidden');
+            }
             for(let i=1; i<=3; i++) {
                 const dot = document.getElementById(`afk-${i}`);
                 if(i <= gameState.afkStrikes) {
@@ -715,6 +883,7 @@
             bigMessage.innerText = text;
             bigMessage.className = 'absolute text-5xl font-bold z-10 pointer-events-none text-center leading-tight anim-slide-text opacity-100';
             
+            // FIX #1 & #2: All animation types now have corresponding CSS classes
             if(type === 'out') { bigMessage.classList.add('text-glow-pink'); body.classList.add('anim-out'); } 
             else if(type === 'anim-1') { bigMessage.classList.add('text-glow-green'); body.classList.add('anim-1'); } 
             else if(type === 'anim-4') { bigMessage.classList.add('text-yellow-400'); body.classList.add('anim-4'); } 
@@ -748,6 +917,12 @@
         function handleWicket() { handleInningsEnd(); }
 
         function handleInningsEnd() {
+            // FIX #5: Clear turn timer when innings ends
+            if (timers.turn) {
+                clearInterval(timers.turn);
+                timers.turn = null;
+            }
+            
             if(gameState.innings === 1) {
                 gameState.innings = 2;
                 gameState.target = gameState.playerRole === 'bat' ? gameState.scores.player : gameState.scores.cpu;
@@ -772,6 +947,8 @@
         function startSecondInnings() {
             gameState.playerRole = gameState.playerRole === 'bat' ? 'bowl' : 'bat';
             gameState.balls = 0;
+            gameState.afkStrikes = 0; // Reset AFK strikes for new innings
+            updateAFKUI();
             updateHUD();
             showScreen('screen-game');
             startTurnTimer();
@@ -799,6 +976,9 @@
         }
 
         function checkFinalResult() {
+            // FIX #5: Clear all timers when match ends
+            clearAllTimers();
+            
             let winner = null;
             if (gameState.scores.player > gameState.scores.cpu) winner = 'player';
             else if (gameState.scores.cpu > gameState.scores.player) winner = 'cpu';
@@ -816,22 +996,25 @@
                 let countdown = 3;
                 btn.innerText = `START SUPER OVER (${countdown})`;
                 
-                clearInterval(timers.superOver);
+                // FIX #5: Clear existing super over timer
+                if (timers.superOver) clearInterval(timers.superOver);
                 timers.superOver = setInterval(() => {
                     countdown--;
                     if(countdown > 0) {
                         btn.innerText = `START SUPER OVER (${countdown})`;
                     } else {
                         clearInterval(timers.superOver);
-                        if (!isOnlineMode) initMatch(1);
-                        else { gameState.totalOvers = 1; startGame(); }
+                        timers.superOver = null;
+                        startSuperOver();
                     }
                 }, 1000);
 
                 btn.onclick = () => { 
-                    clearInterval(timers.superOver);
-                    if (!isOnlineMode) initMatch(1);
-                    else { gameState.totalOvers = 1; startGame(); }
+                    if (timers.superOver) {
+                        clearInterval(timers.superOver);
+                        timers.superOver = null;
+                    }
+                    startSuperOver();
                 };
                 
                 isAnimating = false;
@@ -839,7 +1022,27 @@
             }
         }
 
+        // FIX #5: Extracted super over logic to separate function
+        function startSuperOver() {
+            gameState.totalOvers = 1;
+            gameState.maxBalls = 6;
+            gameState.innings = 1;
+            gameState.scores = { player: 0, cpu: 0 };
+            gameState.target = null;
+            gameState.afkStrikes = 0;
+            
+            if (!isOnlineMode) {
+                showScreen('screen-toss');
+                executeToss();
+            } else {
+                startGame();
+            }
+        }
+
         function endMatch(winner) {
+            // FIX #5: Clear all timers when match ends
+            clearAllTimers();
+            
             document.getElementById('res-player-score').innerText = gameState.scores.player;
             document.getElementById('res-cpu-score').innerText = gameState.scores.cpu;
             document.getElementById('res-name-you').innerText = myName;
