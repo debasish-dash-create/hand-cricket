@@ -64,7 +64,7 @@
 
         /* Holo Outline Hand CSS */
         .hand-icon {
-            font-size: 6rem;
+            font-size: 4.5rem;
             display: inline-block;
             transform-origin: center bottom; /* Pivots from the wrist */
             transition: all 0.1s ease;
@@ -138,19 +138,42 @@
         .active-screen { display: flex; }
         .timer-bar { height: 8px; background: var(--neon-blue); width: 100%; transition: width 0.1s linear; }
 
-        /* --- BULLETPROOF MOBILE RESPONSIVENESS --- */
-        @media (max-width: 500px) {
-            h1.text-4xl { font-size: 2rem; line-height: 2.5rem; margin-bottom: 1.5rem; }
-            .hand-icon { font-size: 3.5rem; } /* Prevents fists overlapping */
-            
-            /* Fits hexagons exactly onto small screens */
-            .hex-button { width: 50px; height: 58px; font-size: 1.2rem; border-width: 1px; }
-            #controls-grid { gap: 1rem 0.5rem; }
-            
-            .coin-container { width: 90px; height: 90px; margin-bottom: 1.5rem; }
-            .text-5xl { font-size: 2.5rem !important; }
-            .p-4 { padding: 0.75rem; } /* Shrinks input and button padding */
-            #move-reveal { padding: 0 1rem !important; width: 100% !important; }
+        #move-reveal {
+            display: flex;
+            justify-content: space-around; /* Spreads hands wide apart */
+            align-items: center;
+            width: 100%;
+            padding: 0 10px;
+        }
+        #vs-text {
+            font-size: 1.5rem;
+            margin-top: 20px; /* Separates VS from hands */
+        }
+        /* Keep the strike dots centered below everything */
+        #afk-warnings {
+            margin-top: auto;
+        }
+        /* FIX: Arena Layout */
+        #action-arena {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes elements to top, middle, and bottom of arena */
+            padding: 20px 0;
+            height: 35vh; /* Gives the hands a dedicated area that doesn't collapse */
+        }
+        /* Ensure hexagons don't overflow */
+        #controls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+        /* Mobile specific adjustments */
+        @media (max-height: 700px) {
+            .hand-icon { font-size: 3.5rem; }
+            #action-arena { height: 30vh; }
+            .hex-button { width: 50px; height: 60px; font-size: 1rem; }
         }
     </style>
 </head>
