@@ -24,6 +24,7 @@
             touch-action: manipulation; 
         }
 
+        /* Stadium Background */
         .stadium-bg {
             background: 
                 radial-gradient(circle at 10% 10%, rgba(0, 255, 255, 0.25) 0%, transparent 50%),
@@ -48,7 +49,7 @@
             z-index: -1;
         }
 
-        /* Input Controls */
+        /* Input Controls (Hexagons) */
         .hex-wrapper { filter: drop-shadow(0 0 8px var(--neon-blue)); transition: all 0.1s ease-in-out; cursor: pointer; }
         .hex-wrapper:active { transform: scale(0.9); filter: drop-shadow(0 0 15px var(--neon-pink)); }
 
@@ -61,22 +62,39 @@
         .hex-wrapper.disabled { pointer-events: none; filter: drop-shadow(0 0 2px #555); }
         .hex-wrapper.disabled .hex-button { color: #555; border-color: #555; text-shadow: none; }
 
-        /* Hands */
+        /* Holo Outline Hand CSS */
         .hand-icon {
             font-size: 6rem;
             display: inline-block;
-            transform-origin: center bottom;
+            transform-origin: center bottom; /* Pivots from the wrist */
             transition: all 0.1s ease;
         }
         
-        .holo-p1 { -webkit-text-fill-color: transparent; -webkit-text-stroke: 3px var(--neon-blue); filter: drop-shadow(0 0 10px var(--neon-blue)); }
-        .holo-p2 { -webkit-text-fill-color: transparent; -webkit-text-stroke: 3px var(--neon-pink); filter: drop-shadow(0 0 10px var(--neon-pink)); }
+        .holo-p1 {
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 3px var(--neon-blue);
+            filter: drop-shadow(0 0 10px var(--neon-blue));
+        }
 
+        .holo-p2 {
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 3px var(--neon-pink);
+            filter: drop-shadow(0 0 10px var(--neon-pink));
+        }
+
+        /* Face each other */
         .face-right { transform: rotate(90deg); }
         .face-left { transform: scaleX(-1) rotate(90deg); }
 
-        @keyframes wristShakeRight { 0%, 100% { transform: rotate(90deg); } 50% { transform: rotate(115deg); } }
-        @keyframes wristShakeLeft { 0%, 100% { transform: scaleX(-1) rotate(90deg); } 50% { transform: scaleX(-1) rotate(115deg); } }
+        /* Wrist Shake Animations */
+        @keyframes wristShakeRight {
+            0%, 100% { transform: rotate(90deg); }
+            50% { transform: rotate(115deg); } 
+        }
+        @keyframes wristShakeLeft {
+            0%, 100% { transform: scaleX(-1) rotate(90deg); }
+            50% { transform: scaleX(-1) rotate(115deg); }
+        }
 
         .shaking-p1 { animation: wristShakeRight 0.3s infinite ease-in-out; }
         .shaking-p2 { animation: wristShakeLeft 0.3s infinite ease-in-out; }
@@ -120,16 +138,19 @@
         .active-screen { display: flex; }
         .timer-bar { height: 8px; background: var(--neon-blue); width: 100%; transition: width 0.1s linear; }
 
-        /* STRICT MOBILE VIEW FIXES */
-        @media (max-width: 480px) {
-            .hand-icon { font-size: 4rem; } /* Shrinks hands */
-            .hex-button { width: 50px; height: 60px; font-size: 1.2rem; } /* Shrinks buttons */
-            .coin-container { width: 90px; height: 90px; margin-bottom: 1.5rem; } /* Shrinks coin */
-            .coin-face { font-size: 0.8rem; }
-            h1.text-4xl { font-size: 2rem; line-height: 2.5rem; } /* Shrinks main title */
-            .text-5xl { font-size: 3rem !important; } /* Shrinks big animation text */
-            #controls-grid { gap: 1rem 0.5rem; } /* Tightens the button grid */
-            .px-4 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        /* --- BULLETPROOF MOBILE RESPONSIVENESS --- */
+        @media (max-width: 500px) {
+            h1.text-4xl { font-size: 2rem; line-height: 2.5rem; margin-bottom: 1.5rem; }
+            .hand-icon { font-size: 3.5rem; } /* Prevents fists overlapping */
+            
+            /* Fits hexagons exactly onto small screens */
+            .hex-button { width: 50px; height: 58px; font-size: 1.2rem; border-width: 1px; }
+            #controls-grid { gap: 1rem 0.5rem; }
+            
+            .coin-container { width: 90px; height: 90px; margin-bottom: 1.5rem; }
+            .text-5xl { font-size: 2.5rem !important; }
+            .p-4 { padding: 0.75rem; } /* Shrinks input and button padding */
+            #move-reveal { padding: 0 1rem !important; width: 100% !important; }
         }
     </style>
 </head>
@@ -152,9 +173,9 @@
         <h2 class="text-2xl text-glow-blue mb-6">RULES OF ENGAGEMENT</h2>
         <div class="w-full max-w-md border-2 border-cyan-400 p-6 shadow-[0_0_15px_#0ff] mb-8 text-xs leading-relaxed text-gray-200">
             <ul class="list-disc pl-4 space-y-4">
-                <li><span class="text-glow-pink">THE TOSS:</span> A coin flip decides who bats or bowls.</li>
-                <li><span class="text-glow-pink">THE CLOCK:</span> You have exactly <span class="text-red-500">3 SECONDS</span> to select a number.</li>
-                <li><span class="text-glow-pink">AFK PENALTY:</span> Miss the timer? It's a dot ball (0). 3 misses = OUT!</li>
+                <li><span class="text-glow-pink">THE TOSS:</span> A coin flip decides who bats or bowls. (Synced online).</li>
+                <li><span class="text-glow-pink">THE CLOCK:</span> You have exactly <span class="text-red-500">3 SECONDS</span> to select a number (1-6).</li>
+                <li><span class="text-glow-pink">AFK PENALTY:</span> Miss the timer? It's a dot ball (0). 3 consecutive misses = OUT!</li>
                 <li><span class="text-glow-pink">SCORING:</span> If your number differs from the bowler's, batsman scores that number.</li>
                 <li><span class="text-glow-pink">WICKETS:</span> 1 wicket match! If numbers match, batsman is OUT.</li>
             </ul>
@@ -224,16 +245,22 @@
             <div id="big-message" class="absolute text-5xl font-bold opacity-0 transition-opacity duration-200 z-10 pointer-events-none text-center leading-tight"></div>
             
             <div class="flex justify-between w-full max-w-md px-4 items-center opacity-0 transition-opacity" id="move-reveal">
+                <!-- Player Hand -->
                 <div class="flex flex-col items-center">
                     <span class="text-[10px] text-gray-400 mb-2">YOU</span>
-                    <div id="reveal-player"></div>
+                    <div id="reveal-player">
+                        <!-- Hand icon injected here via JS -->
+                    </div>
                 </div>
                 
                 <div class="text-xl text-gray-600 font-bold" id="vs-text">VS</div>
                 
+                <!-- CPU/Opponent Hand -->
                 <div class="flex flex-col items-center">
                     <span class="text-[10px] text-gray-400 mb-2" id="opp-label">CPU</span>
-                    <div id="reveal-cpu"></div>
+                    <div id="reveal-cpu">
+                        <!-- Hand icon injected here via JS -->
+                    </div>
                 </div>
             </div>
             
@@ -250,7 +277,9 @@
             <div class="w-full bg-gray-900 h-2 mb-4 border border-gray-700">
                 <div id="turn-timer-bar" class="timer-bar w-full"></div>
             </div>
-            <div class="grid grid-cols-3 gap-y-6 gap-x-2 place-items-center" id="controls-grid"></div>
+            <div class="grid grid-cols-3 gap-y-6 gap-x-2 place-items-center" id="controls-grid">
+                <!-- Hexagons generated by JS -->
+            </div>
         </div>
     </div>
 
@@ -297,13 +326,13 @@
         let timers = { toss: null, turn: null, superOver: null };
         let isAnimating = false;
 
-        // Vulcan salute used for 4
+        // Hand Mapping Array (4 is now Vulcan salute)
         const hands = {
             0: "✊",
             1: "☝️",
             2: "✌️",
             3: "🤟",
-            4: "🖖", 
+            4: "🖖",
             5: "🖐️",
             6: "👍"
         };
@@ -384,6 +413,7 @@
                     const myMove = myPlayerId === "p1" ? data.p1_move.move : data.p2_move.move;
                     const oppMove = myPlayerId === "p1" ? data.p2_move.move : data.p1_move.move;
                     
+                    // Stop opponent shaking, reveal number
                     revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left">${hands[oppMove]}</div>`;
                     setTimeout(() => resolveMove(myMove, oppMove), 800);
                 }
@@ -536,6 +566,7 @@
             if(isAnimating) return;
             setControlsDisabled(false);
             
+            // Show the shaking closed fists immediately
             moveReveal.style.opacity = 1;
             revPlayer.innerHTML = `<div class="hand-icon holo-p1 face-right shaking-p1">${hands[0]}</div>`;
             revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left shaking-p2">${hands[0]}</div>`;
@@ -565,13 +596,16 @@
             gameState.afkStrikes = 0; 
             updateAFKUI();
             
+            // Stop player shaking, reveal number
             revPlayer.innerHTML = `<div class="hand-icon holo-p1 face-right">${hands[playerNum]}</div>`;
             isAnimating = true;
 
             if (isOnlineMode) {
+                // Online: CPU fist pulses while waiting
                 revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left shaking-p2 animate-pulse">${hands[0]}</div>`;
                 sendMessageToServer("move", { move: playerNum });
             } else {
+                // Offline: Instantly reveal CPU
                 const cpuNum = Math.floor(Math.random() * 6) + 1;
                 revCpu.innerHTML = `<div class="hand-icon holo-p2 face-left">${hands[cpuNum]}</div>`;
                 setTimeout(() => resolveMove(playerNum, cpuNum), 800);
