@@ -246,6 +246,30 @@
         </div>
     </div>
 
+    <div id="screen-online-format" class="screen">
+        <h2 class="text-2xl text-glow-blue mb-8 text-center tracking-widest font-bold">SELECT FORMAT</h2>
+        <div class="flex flex-col gap-6 w-full max-w-sm">
+            <button onclick="selectOnlineFormat('1v1')" class="p-4 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_10px_#0ff] rounded-xl">1v1 MATCH</button>
+            <button onclick="selectOnlineFormat('2v2')" class="p-4 border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition uppercase text-sm font-bold shadow-[0_0_10px_#ff007f] rounded-xl">2v2 TEAM MATCH</button>
+            <button onclick="showScreen('screen-menu')" class="mt-4 p-3 border border-gray-500 text-gray-400 hover:bg-gray-500 hover:text-white transition uppercase text-xs rounded-xl">Back</button>
+        </div>
+    </div>
+
+    <div id="screen-rules-2v2" class="screen bg-black/80 backdrop-blur-sm">
+        <h2 class="text-xl sm:text-2xl text-glow-pink mb-4 flex-shrink-0 font-bold tracking-widest">2V2 TACTICS</h2>
+        <div class="w-full max-w-md border-2 border-pink-500 p-4 sm:p-6 shadow-[0_0_15px_rgba(255,0,127,0.3)] mb-4 text-xs leading-relaxed text-gray-200 overflow-y-auto max-h-[55vh] flex-shrink rounded-xl">
+            <ul class="list-disc pl-4 space-y-3">
+                <li><span class="text-glow-blue">TEAM PLAY:</span> 2 Players vs 2 Players. 4 Overs Total.</li>
+                <li><span class="text-glow-blue">STRIKE ROTATION:</span> Scoring 1, 3, or 5 runs rotates the strike to your partner.</li>
+                <li><span class="text-glow-blue">OVER ROTATION:</span> The bowler and striker both rotate at the end of every 6-ball over.</li>
+                <li><span class="text-glow-blue">WICKETS:</span> Each team has 2 Wickets. If a player gets out, the next player bats until both are out.</li>
+            </ul>
+        </div>
+        <div class="flex gap-4 w-full max-w-md flex-shrink-0 mt-auto">
+            <button onclick="acceptRules2v2()" class="flex-1 p-3 bg-pink-600 text-white font-bold uppercase text-xs hover:bg-pink-500 shadow-[0_0_15px_rgba(255,0,127,0.5)] rounded-xl">Understood & Play</button>
+        </div>
+    </div>
+
     <div id="screen-rules" class="screen bg-black/80 backdrop-blur-sm">
         <h2 class="text-xl sm:text-2xl text-glow-blue mb-4 flex-shrink-0">RULES OF ENGAGEMENT</h2>
         <div class="w-full max-w-md border-2 border-cyan-400 p-4 sm:p-6 shadow-[0_0_15px_#0ff] mb-4 text-xs leading-relaxed text-gray-200 overflow-y-auto max-h-[55vh] flex-shrink">
@@ -275,8 +299,7 @@
     <div id="screen-friend-lobby" class="screen">
         <h2 class="text-2xl text-glow-blue mb-8 text-center tracking-widest font-bold">FRIEND MATCH</h2>
         <div class="flex flex-col gap-4 w-full max-w-sm">
-            <button onclick="createRoom('1v1')" class="p-4 border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_10px_#39ff14] rounded-xl">Create 1v1 Room</button>
-            <button onclick="createRoom('2v2')" class="p-4 border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_10px_#fbff00] rounded-xl">Create 2v2 Room</button>
+            <button onclick="createRoom()" class="p-4 border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_10px_#39ff14] rounded-xl">Create Room</button>
             
             <div class="relative w-full mt-4 mb-4">
                 <div class="absolute inset-0 flex items-center" aria-hidden="true">
@@ -289,7 +312,7 @@
 
             <input type="text" id="roomCodeInput" placeholder="6-DIGIT CODE" class="w-full bg-black/60 border border-gray-700 text-cyan-400 p-4 text-center uppercase focus:outline-none focus:border-cyan-500 shadow-[0_0_15px_rgba(0,229,255,0.2)] tracking-widest text-xl rounded-xl" maxlength="6">
             <button onclick="joinRoom()" class="p-4 border-2 border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_10px_#0ff] rounded-xl">Join Room</button>
-            <button onclick="showScreen('screen-online-menu')" class="mt-2 p-3 border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition uppercase text-xs rounded-xl">Back</button>
+            <button onclick="showScreen('screen-online-format')" class="mt-2 p-3 border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition uppercase text-xs rounded-xl">Back</button>
         </div>
     </div>
 
@@ -537,7 +560,20 @@
             myName = inputName ? inputName.toUpperCase() : ""; 
             
             selectedGameMode = mode;
-            showScreen('screen-rules');
+            if (mode === 'online') {
+                showScreen('screen-online-format');
+            } else {
+                showScreen('screen-rules');
+            }
+        }
+
+        function selectOnlineFormat(format) {
+            currentMode = format;
+            if (format === '1v1') {
+                showScreen('screen-mode'); // Routes to Overs Selection
+            } else {
+                showScreen('screen-rules-2v2'); // Routes directly to 2v2 rules
+            }
         }
 
         function acceptRules() {
@@ -547,8 +583,11 @@
                 document.getElementById('opp-label').innerText = oppName;
                 document.getElementById('res-name-opp').innerText = oppName;
             }
-            // Always show mode selection screen first
             showScreen('screen-mode');
+        }
+
+        function acceptRules2v2() {
+            showFriendLobby(); 
         }
 
         function startQuickMatch() {
@@ -561,8 +600,23 @@
             showScreen('screen-friend-lobby');
         }
 
-        function createRoom(mode) {
-            currentMode = mode;
+        function initMatch(overs) {
+            gameState.totalOvers = overs;
+            gameState.maxBalls = overs * 6;
+            gameState.innings = 1;
+            gameState.scores = { player: 0, cpu: 0 };
+            gameState.target = null;
+            
+            if (selectedGameMode === 'online') {
+                showScreen('screen-online-menu'); 
+            } else {
+                showScreen('screen-toss');
+                executeToss();
+            }
+        }
+
+        function createRoom() {
+            // Uses the currentMode locked in by selectOnlineFormat
             currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById('display-room-code').innerText = currentRoomCode;
             showScreen('screen-waiting-room');
@@ -629,33 +683,32 @@
 
             socket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
-                // --- NEW LOBBY SYNC LOGIC ---
-                if (data.type === "lobby_update") {
+
+                // 1. Connection & Lobby Logic
+                if (data.type === "connected") {
+                    myPlayerId = data.player_id;
+                }
+                else if (data.type === "lobby_update") {
                     isHost = (data.host === myPlayerId);
                     currentMode = data.mode;
                     
-                    // Show or hide the second player slots based on mode
                     document.getElementById('t1-slot-2').classList.toggle('hidden', currentMode === "1v1");
                     document.getElementById('t2-slot-2').classList.toggle('hidden', currentMode === "1v1");
 
-                    // Manage Team Name Inputs (Only Host can type)
                     const t1Input = document.getElementById('team-1-name');
                     const t2Input = document.getElementById('team-2-name');
                     t1Input.disabled = !isHost;
                     t2Input.disabled = !isHost;
                     
-                    // Update names if the user isn't currently typing in them
                     if (document.activeElement !== t1Input) t1Input.value = data.team_1.name;
                     if (document.activeElement !== t2Input) t2Input.value = data.team_2.name;
 
-                    // Render all 4 slots dynamically
                     renderLobbySlot('t1-p1-name', 'btn-add-cpu-t1-p1', data.team_1.players[0]);
                     if (currentMode === "2v2") renderLobbySlot('t1-p2-name', 'btn-add-cpu-t1-p2', data.team_1.players[1]);
                     
                     renderLobbySlot('t2-p1-name', 'btn-add-cpu-t2-p1', data.team_2.players[0]);
                     if (currentMode === "2v2") renderLobbySlot('t2-p2-name', 'btn-add-cpu-t2-p2', data.team_2.players[1]);
 
-                    // Show Start Match button ONLY to the host
                     const startBtn = document.getElementById('btn-start-match');
                     if (isHost) {
                         startBtn.classList.remove('hidden');
@@ -672,16 +725,13 @@
                     }
                 }
                 else if (data.type === "init_toss") {
-                    // Transition to the Toss phase!
                     showToast("MATCH STARTING!");
                     setTimeout(() => { 
                         showScreen('screen-toss'); 
-                        // We will update the executeToss logic in Phase 3
                     }, 1500);
                 }
-                // --- END NEW LOBBY LOGIC ---
-
-                if (data.type === "queue") {
+                // 2. Queue & Matchmaking
+                else if (data.type === "queue") {
                     // Waiting
                 } 
                 else if (data.type === "match_found") {
@@ -697,7 +747,6 @@
                     document.getElementById('opp-label').innerText = oppName;
                     document.getElementById('res-name-opp').innerText = oppName;
                     
-                    // DYNAMICALLY SYNC OVERS FROM SERVER
                     gameState.totalOvers = data.overs;
                     gameState.maxBalls = data.overs * 6;
                     gameState.innings = 1;
@@ -707,6 +756,7 @@
                     showToast("MATCH FOUND vs " + oppName);
                     setTimeout(() => { showScreen('screen-toss'); executeToss(); }, 1500);
                 }
+                // 3. Gameplay Logic
                 else if (data.type === "toss_result") {
                     const chooser = data.chooser;
                     const choice = data.choice;
@@ -718,17 +768,14 @@
                     const myMove = myPlayerId === "p1" ? data.p1_move.move : data.p2_move.move;
                     const oppMove = myPlayerId === "p1" ? data.p2_move.move : data.p1_move.move;
                     
-                    // FIX #3: Handle AFK strikes from server in online mode
                     if (data.afk_strikes !== undefined) {
                         gameState.afkStrikes = data.afk_strikes;
                         updateAFKUI();
                     }
                     
-                    // Stop opponent shaking, reveal number
                     revCpu.innerHTML = getHandIcon(oppMove, 'holo-p2', 'face-left');
                     setTimeout(() => resolveMove(myMove, oppMove), 800);
                 }
-                // FIX #3: Handle server-side AFK OUT event
                 else if (data.type === "afk_out") {
                     const outPlayer = data.player_id;
                     if (outPlayer === myPlayerId && gameState.playerRole === 'bat') {
@@ -739,7 +786,6 @@
                         setTimeout(() => handleWicket(), 1500);
                     }
                 }
-                // FIX #6: Handle opponent disconnect
                 else if (data.type === "opponent_disconnected") {
                     showToast("Opponent disconnected. You win!");
                     setTimeout(() => endMatch('player'), 1500);
@@ -770,22 +816,6 @@
         function sendMessageToServer(type, payload) {
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({ type: type, ...payload }));
-            }
-        }
-
-        function initMatch(overs) {
-            gameState.totalOvers = overs;
-            gameState.maxBalls = overs * 6;
-            gameState.innings = 1;
-            gameState.scores = { player: 0, cpu: 0 };
-            gameState.target = null;
-            
-            if (selectedGameMode === 'online') {
-                // Now that overs are selected, route to online menu
-                showScreen('screen-online-menu');
-            } else {
-                showScreen('screen-toss');
-                executeToss();
             }
         }
 
