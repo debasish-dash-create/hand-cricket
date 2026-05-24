@@ -272,40 +272,62 @@
         </div>
     </div>
 
-    <!-- NEW: Friend Lobby (Create / Join) -->
     <div id="screen-friend-lobby" class="screen">
-        <h2 class="text-2xl text-glow-blue mb-8 text-center">FRIEND MATCH</h2>
-        <div class="flex flex-col gap-6 w-full max-w-sm">
-            <button onclick="createRoom()" class="p-4 border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-black transition uppercase text-sm shadow-[0_0_10px_#39ff14]">Create Room</button>
+        <h2 class="text-2xl text-glow-blue mb-8 text-center tracking-widest font-bold">FRIEND MATCH</h2>
+        <div class="flex flex-col gap-4 w-full max-w-sm">
+            <button onclick="createRoom('1v1')" class="p-4 border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_10px_#39ff14] rounded-xl">Create 1v1 Room</button>
+            <button onclick="createRoom('2v2')" class="p-4 border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_10px_#fbff00] rounded-xl">Create 2v2 Room</button>
             
-            <div class="relative w-full mt-2 mb-2">
+            <div class="relative w-full mt-4 mb-4">
                 <div class="absolute inset-0 flex items-center" aria-hidden="true">
                     <div class="w-full border-t border-gray-700"></div>
                 </div>
                 <div class="relative flex justify-center">
-                    <span class="bg-[#050510] px-2 text-xs text-gray-400">OR JOIN ROOM</span>
+                    <span class="bg-black/60 px-3 py-1 rounded-full text-[10px] text-gray-400 border border-gray-700 backdrop-blur-md">OR JOIN ROOM</span>
                 </div>
             </div>
 
-            <input type="text" id="roomCodeInput" placeholder="6-DIGIT CODE" class="w-full bg-black/60 border-2 border-cyan-500 text-cyan-400 p-4 text-center uppercase focus:outline-none focus:border-pink-500 shadow-[0_0_10px_rgba(6,182,212,0.4)] tracking-widest text-xl" maxlength="6">
-            <button onclick="joinRoom()" class="p-4 border-2 border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-black transition uppercase text-sm shadow-[0_0_10px_#0ff]">Join Room</button>
-            <button onclick="showScreen('screen-online-menu')" class="mt-2 p-3 border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-black transition uppercase text-xs">Back</button>
+            <input type="text" id="roomCodeInput" placeholder="6-DIGIT CODE" class="w-full bg-black/60 border border-gray-700 text-cyan-400 p-4 text-center uppercase focus:outline-none focus:border-cyan-500 shadow-[0_0_15px_rgba(0,229,255,0.2)] tracking-widest text-xl rounded-xl" maxlength="6">
+            <button onclick="joinRoom()" class="p-4 border-2 border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_10px_#0ff] rounded-xl">Join Room</button>
+            <button onclick="showScreen('screen-online-menu')" class="mt-2 p-3 border border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition uppercase text-xs rounded-xl">Back</button>
         </div>
     </div>
 
-    <!-- NEW: Waiting Room for the Host -->
     <div id="screen-waiting-room" class="screen">
-        <h2 class="text-xl text-glow-blue mb-4 text-center">ROOM CREATED</h2>
-        <p class="text-[10px] text-gray-400 mb-8 text-center">SHARE THIS CODE WITH YOUR FRIEND</p>
-        
-        <div class="w-full max-w-xs border-2 border-yellow-400 p-6 mb-8 bg-black/80 shadow-[0_0_20px_#fbff00]">
-            <p id="display-room-code" class="text-4xl text-yellow-400 font-bold tracking-widest text-center">------</p>
+        <h2 class="text-2xl text-glow-blue mb-4 text-center tracking-widest font-bold">MATCH LOBBY</h2>
+        <p class="text-xs text-gray-400 mb-6 text-center" id="lobby-code-display">ROOM CODE: <span class="text-yellow-400 font-bold tracking-widest text-lg ml-2" id="display-room-code">------</span></p>
+
+        <div class="w-full max-w-sm bg-black/60 p-4 border-2 border-cyan-500 rounded-xl mb-4 relative shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+            <input type="text" id="team-1-name" value="TEAM 1" class="bg-transparent text-cyan-400 font-bold text-center w-full mb-3 focus:outline-none uppercase" onchange="updateTeamName('team_1', this.value)" disabled>
+            
+            <div class="flex justify-between items-center bg-black/40 p-3 rounded-lg mb-2 border border-gray-700">
+                <span id="t1-p1-name" class="text-sm font-semibold text-gray-300">Waiting for player...</span>
+                <button id="btn-add-cpu-t1-p1" onclick="addCPU('team_1', 0)" class="hidden text-[10px] bg-cyan-600 px-3 py-1 rounded text-white font-bold uppercase tracking-wider hover:bg-cyan-500">Add CPU</button>
+            </div>
+            
+            <div id="t1-slot-2" class="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-gray-700 hidden">
+                <span id="t1-p2-name" class="text-sm font-semibold text-gray-300">Waiting for player...</span>
+                <button id="btn-add-cpu-t1-p2" onclick="addCPU('team_1', 1)" class="hidden text-[10px] bg-cyan-600 px-3 py-1 rounded text-white font-bold uppercase tracking-wider hover:bg-cyan-500">Add CPU</button>
+            </div>
         </div>
+
+        <div class="w-full max-w-sm bg-black/60 p-4 border-2 border-pink-500 rounded-xl mb-8 relative shadow-[0_0_15px_rgba(255,0,127,0.3)]">
+            <input type="text" id="team-2-name" value="TEAM 2" class="bg-transparent text-pink-400 font-bold text-center w-full mb-3 focus:outline-none uppercase" onchange="updateTeamName('team_2', this.value)" disabled>
+            
+            <div class="flex justify-between items-center bg-black/40 p-3 rounded-lg mb-2 border border-gray-700">
+                <span id="t2-p1-name" class="text-sm font-semibold text-gray-300">Waiting for player...</span>
+                <button id="btn-add-cpu-t2-p1" onclick="addCPU('team_2', 0)" class="hidden text-[10px] bg-pink-600 px-3 py-1 rounded text-white font-bold uppercase tracking-wider hover:bg-pink-500">Add CPU</button>
+            </div>
+            
+            <div id="t2-slot-2" class="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-gray-700 hidden">
+                <span id="t2-p2-name" class="text-sm font-semibold text-gray-300">Waiting for player...</span>
+                <button id="btn-add-cpu-t2-p2" onclick="addCPU('team_2', 1)" class="hidden text-[10px] bg-pink-600 px-3 py-1 rounded text-white font-bold uppercase tracking-wider hover:bg-pink-500">Add CPU</button>
+            </div>
+        </div>
+
+        <button id="btn-start-match" onclick="startLobbyMatch()" class="hidden w-full max-w-sm p-4 border-2 border-green-400 text-green-400 hover:bg-green-400 hover:text-black transition uppercase text-sm font-bold shadow-[0_0_15px_#39ff14] mb-4 rounded-xl">Start Match</button>
         
-        <div class="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin shadow-[0_0_15px_#0ff] mb-8"></div>
-        <p class="text-xs text-cyan-400 animate-pulse text-center mb-8">WAITING FOR FRIEND TO JOIN...</p>
-        
-        <button onclick="cancelMatchmaking()" class="p-3 border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-black transition uppercase text-xs">Cancel & Leave</button>
+        <button onclick="cancelMatchmaking()" class="p-3 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition uppercase text-xs rounded-xl shadow-[0_0_10px_#ff0000]">Cancel & Leave</button>
     </div>
 
     <div id="screen-loading" class="screen">
@@ -446,6 +468,8 @@
         let oppName = "CPU";
         let onlineTossWinner = null;
         let currentRoomCode = null;
+        let isHost = false;
+        let currentMode = "1v1";
 
         let gameState = {
             totalOvers: 1, maxBalls: 6, innings: 1, playerRole: 'bat', 
@@ -537,13 +561,11 @@
             showScreen('screen-friend-lobby');
         }
 
-        function createRoom() {
-            // Generate a random 6-digit code
+        function createRoom(mode) {
+            currentMode = mode;
             currentRoomCode = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById('display-room-code').innerText = currentRoomCode;
             showScreen('screen-waiting-room');
-            
-            // Connect to server immediately to register the room
             connectToServer(true); 
         }
 
@@ -571,10 +593,16 @@
         function connectToServer(isCreating = false) {
             if (!isCreating) showScreen('screen-loading');
             
-            // WebSocket server URL - endpoint is /ws/pvp with name as query param
+            // Close existing zombie connections
+            if (socket) {
+                isIntentionalDisconnect = true;
+                socket.close();
+            }
+            isIntentionalDisconnect = false;
+
             const playerName = myName || "Guest";
-            // Append overs to the WebSocket URL
-            let wsUrl = `wss://hand-cricket-api.onrender.com/ws/pvp?name=${encodeURIComponent(playerName)}&overs=${gameState.totalOvers}`;
+            // Include overs AND mode in the WebSocket URL
+            let wsUrl = `wss://hand-cricket-api.onrender.com/ws/pvp?name=${encodeURIComponent(playerName)}&overs=${gameState.totalOvers}&mode=${currentMode}`;
             
             if (currentRoomCode) {
                 wsUrl += `&room=${currentRoomCode}`;
@@ -588,10 +616,8 @@
                 return;
             }
             
-            socket.onopen = function() {
-                reconnectAttempts = 0;
-                // Server handles queue automatically on connection, no need to send join_queue
-            };
+            socket.onopen = function() { reconnectAttempts = 0; };
+            // ... (keep your existing socket.onerror logic here)
 
             socket.onerror = function(error) {
                 console.error("WebSocket error:", error);
@@ -603,6 +629,57 @@
 
             socket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
+                // --- NEW LOBBY SYNC LOGIC ---
+                if (data.type === "lobby_update") {
+                    isHost = (data.host === myPlayerId);
+                    currentMode = data.mode;
+                    
+                    // Show or hide the second player slots based on mode
+                    document.getElementById('t1-slot-2').classList.toggle('hidden', currentMode === "1v1");
+                    document.getElementById('t2-slot-2').classList.toggle('hidden', currentMode === "1v1");
+
+                    // Manage Team Name Inputs (Only Host can type)
+                    const t1Input = document.getElementById('team-1-name');
+                    const t2Input = document.getElementById('team-2-name');
+                    t1Input.disabled = !isHost;
+                    t2Input.disabled = !isHost;
+                    
+                    // Update names if the user isn't currently typing in them
+                    if (document.activeElement !== t1Input) t1Input.value = data.team_1.name;
+                    if (document.activeElement !== t2Input) t2Input.value = data.team_2.name;
+
+                    // Render all 4 slots dynamically
+                    renderLobbySlot('t1-p1-name', 'btn-add-cpu-t1-p1', data.team_1.players[0]);
+                    if (currentMode === "2v2") renderLobbySlot('t1-p2-name', 'btn-add-cpu-t1-p2', data.team_1.players[1]);
+                    
+                    renderLobbySlot('t2-p1-name', 'btn-add-cpu-t2-p1', data.team_2.players[0]);
+                    if (currentMode === "2v2") renderLobbySlot('t2-p2-name', 'btn-add-cpu-t2-p2', data.team_2.players[1]);
+
+                    // Show Start Match button ONLY to the host
+                    const startBtn = document.getElementById('btn-start-match');
+                    if (isHost) {
+                        startBtn.classList.remove('hidden');
+                        startBtn.classList.add('block');
+                    } else {
+                        startBtn.classList.add('hidden');
+                        startBtn.classList.remove('block');
+                    }
+                }
+                else if (data.type === "error") {
+                    showToast(data.message);
+                    if (data.message.includes("Room is full") || data.message.includes("started")) {
+                        cancelMatchmaking();
+                    }
+                }
+                else if (data.type === "init_toss") {
+                    // Transition to the Toss phase!
+                    showToast("MATCH STARTING!");
+                    setTimeout(() => { 
+                        showScreen('screen-toss'); 
+                        // We will update the executeToss logic in Phase 3
+                    }, 1500);
+                }
+                // --- END NEW LOBBY LOGIC ---
 
                 if (data.type === "queue") {
                     // Waiting
@@ -1168,6 +1245,41 @@
             
             isAnimating = false;
             showScreen('screen-result');
+        }
+        // LOBBY HELPER FUNCTIONS
+        function renderLobbySlot(nameElementId, btnElementId, playerInfo) {
+            const nameEl = document.getElementById(nameElementId);
+            const btnEl = document.getElementById(btnElementId);
+            
+            if (playerInfo) {
+                nameEl.innerText = playerInfo.name;
+                nameEl.className = playerInfo.is_cpu ? 'text-sm font-bold text-yellow-400' : 'text-sm font-bold text-white';
+                btnEl.classList.add('hidden'); // Hide the Add CPU button if slot is taken
+            } else {
+                nameEl.innerText = "Waiting for player...";
+                nameEl.className = 'text-sm font-semibold text-gray-400';
+                btnEl.classList.remove('hidden');
+                // Only show the Add CPU button to the Host
+                if (!isHost) btnEl.classList.add('hidden');
+            }
+        }
+
+        function updateTeamName(team, newName) {
+            if (isHost && newName.trim() !== "") {
+                sendMessageToServer("change_team_name", { team: team, new_name: newName.trim() });
+            }
+        }
+
+        function addCPU(team, slotIndex) {
+            if (isHost) {
+                sendMessageToServer("add_cpu", { team: team, slot_index: slotIndex });
+            }
+        }
+
+        function startLobbyMatch() {
+            if (isHost) {
+                sendMessageToServer("start_match", {});
+            }
         }
     </script>
 </body>
