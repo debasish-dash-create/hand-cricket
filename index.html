@@ -566,8 +566,7 @@
             const { data, error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    // Redirects them right back to your game after they log in
-                    redirectTo: window.location.origin
+                    redirectTo: "https://hand-cricket-api.onrender.com" // Use your actual Render URL
                 }
             });
 
