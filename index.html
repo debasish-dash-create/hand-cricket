@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neon Hand Cricket</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -240,9 +241,20 @@
         <h1 class="text-4xl text-center mb-8 text-glow-pink leading-tight">NEON<br>HAND CRICKET</h1>
         
         <div class="flex flex-col gap-4 w-full max-w-sm">
-            <input type="text" id="playerNameInput" placeholder="ENTER GUEST NAME" class="w-full bg-black/60 border-2 border-cyan-500 text-cyan-400 p-4 text-center uppercase focus:outline-none focus:border-pink-500 shadow-[0_0_10px_rgba(6,182,212,0.4)] mb-4" maxlength="12">
-            <button onclick="setModeAndShowRules('pvc')" class="p-4 border-2 border-white text-white hover:bg-white hover:text-black transition uppercase text-sm shadow-[0_0_10px_rgba(255,255,255,0.4)]">Play vs CPU</button>
-            <button onclick="setModeAndShowRules('online')" class=" neon-button p-4 border-2 border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-black transition uppercase text-sm shadow-[0_0_10px_rgba(6,182,212,0.4)]">Online PvP</button>
+            <button id="btn-google-login" onclick="loginWithGoogle()" class="p-4 bg-white text-black font-bold uppercase text-sm shadow-[0_0_15px_rgba(255,255,255,0.6)] flex items-center justify-center gap-3 rounded-xl hover:bg-gray-200 transition">
+                <i class="fa-brands fa-google text-red-500 text-lg"></i> LOGIN WITH GOOGLE
+            </button>
+            
+            <div id="user-profile-display" class="hidden flex flex-col items-center p-4 bg-black/60 border-2 border-green-500 rounded-xl shadow-[0_0_15px_rgba(57,255,20,0.3)] mb-2">
+                <p class="text-[10px] text-gray-400 tracking-widest mb-1">WELCOME BACK,</p>
+                <p id="display-player-name" class="text-xl font-bold text-glow-green uppercase tracking-wider mb-3">PLAYER</p>
+                <button onclick="logout()" class="px-4 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition uppercase text-[10px] rounded shadow-[0_0_10px_rgba(255,0,0,0.4)]">Logout</button>
+            </div>
+
+            <input type="text" id="playerNameInput" placeholder="OR ENTER GUEST NAME" class="w-full bg-black/60 border-2 border-cyan-500 text-cyan-400 p-4 text-center uppercase focus:outline-none focus:border-pink-500 shadow-[0_0_10px_rgba(6,182,212,0.4)] mb-4 rounded-xl" maxlength="12">
+            
+            <button onclick="setModeAndShowRules('pvc')" class="p-4 border-2 border-white text-white hover:bg-white hover:text-black transition uppercase text-sm shadow-[0_0_10px_rgba(255,255,255,0.4)] rounded-xl">Play vs CPU</button>
+            <button onclick="setModeAndShowRules('online')" class=" neon-button p-4 border-2 border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-black transition uppercase text-sm shadow-[0_0_10px_rgba(6,182,212,0.4)] rounded-xl">Online PvP</button>
         </div>
     </div>
 
@@ -531,13 +543,40 @@
             </div>
         </div>
         <p class="text-xs text-yellow-400 mb-8 text-center" id="result-subtitle">TARGET: 0 RUNS</p>
-        <button id="result-btn" onclick="startSecondInnings()" class="w-full max-w-xs p-4 bg-white text-black font-bold uppercase text-sm hover:bg-gray-200">BOWL NOW</button>
+        
+        <div class="flex gap-4 w-full max-w-sm">
+            <button id="result-btn-rematch" onclick="requestRematch()" class="flex-1 p-4 border-2 border-cyan-500 text-cyan-500 font-bold uppercase text-xs hover:bg-cyan-500 hover:text-black transition hidden">REMATCH</button>
+            <button id="result-btn" onclick="startSecondInnings()" class="flex-1 p-4 bg-white text-black font-bold uppercase text-sm hover:bg-gray-200">BOWL NOW</button>
+        </div>
     </div>
-
     <div id="toast" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-cyan-600 text-white text-xs px-4 py-2 rounded shadow-[0_0_10px_#0ff] opacity-0 pointer-events-none transition-opacity duration-300 z-50"></div>
 
     <script>
         let isIntentionalDisconnect = false;
+        // --- SUPABASE SETUP ---
+        const SUPABASE_URL = 'https://hjtdvmvsblqjchwssnqd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqdGR2bXZzYmxxamNod3NzbnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MDU4MzcsImV4cCI6MjA5NTM4MTgzN30.UFzCiZHFTCjV_N_J9byg9agRpwfF13pwQev8AgPrY60'; // Paste your key here!
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- GOOGLE LOGIN ---
+        async function loginWithGoogle() {
+            const btn = document.getElementById('btn-google-login');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> CONNECTING...';
+            
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    // Redirects them right back to your game after they log in
+                    redirectTo: window.location.origin
+                }
+            });
+
+            if (error) {
+                console.error("Login error:", error.message);
+                showToast("Login failed. Try again.");
+                btn.innerHTML = '<i class="fa-brands fa-google text-red-500 text-lg"></i> LOGIN WITH GOOGLE';
+            }
+        }
         const body = document.body;
         const screens = document.querySelectorAll('.screen');
         const bigMessage = document.getElementById('big-message');
@@ -569,6 +608,7 @@
         };
         let timers = { toss: null, turn: null, superOver: null };
         let isAnimating = false;
+        let matchConcluded = false;
 
         // FontAwesome Hand Mapping
         const hands = {
@@ -625,8 +665,11 @@
         }
 
         function setModeAndShowRules(mode) {
-            const inputName = document.getElementById('playerNameInput').value.trim();
-            myName = inputName ? inputName.toUpperCase() : ""; 
+            // Only grab guest name if they ARE NOT logged in via Google
+            if (!currentUser) {
+                const inputName = document.getElementById('playerNameInput').value.trim();
+                myName = inputName ? inputName.toUpperCase() : ""; 
+            }
             
             selectedGameMode = mode;
             if (mode === 'online') {
@@ -893,8 +936,17 @@
                     }
                 }
                 else if (data.type === "opponent_disconnected") {
+                    if (matchConcluded) {
+                        showToast("Opponent left the post-match screen.");
+                        return; // Stop here! Don't overwrite the result.
+                    }
                     showToast("Opponent disconnected. You win!");
                     setTimeout(() => endMatch('player'), 1500);
+                }
+                // Add this into your socket.onmessage chain to catch the server's restart command:
+                else if (data.type === "rematch_accepted") {
+                    showToast("Rematch Accepted! Starting new toss...");
+                    setTimeout(() => { showScreen('screen-toss'); executeToss(); }, 1500);
                 }
             };
 
@@ -1023,7 +1075,9 @@
         }
 
         function startGame() {
+            matchConcluded = false;
             gameState.balls = 0;
+            // ... rest of the function stays the same
             gameState.afkStrikes = 0;
             if(gameState.innings === 1) {
                 gameState.scores.player = 0;
@@ -1247,6 +1301,7 @@
                 document.getElementById('res-name-you').innerText = myName;
                 document.getElementById('result-title').innerHTML = "INNINGS<br>BREAK";
                 document.getElementById('result-subtitle').innerText = `TARGET: ${gameState.target + 1} RUNS`;
+                document.getElementById('result-btn-rematch').classList.add('hidden');
                 
                 const btn = document.getElementById('result-btn');
                 btn.innerText = gameState.playerRole === 'bat' ? 'BOWL NOW' : 'BAT NOW';
@@ -1257,6 +1312,7 @@
             } else {
                 checkFinalResult();
             }
+
         }
 
         function startSecondInnings() {
@@ -1355,7 +1411,7 @@
         }
 
         function endMatch(winner) {
-            // FIX #5: Clear all timers when match ends
+            matchConcluded = true;
             clearAllTimers();
             
             document.getElementById('res-player-score').innerText = gameState.scores.player;
@@ -1363,6 +1419,14 @@
             document.getElementById('res-name-you').innerText = myName;
             
             const title = document.getElementById('result-title');
+            const rematchBtn = document.getElementById('result-btn-rematch');
+            if (isOnlineMode) {
+                rematchBtn.classList.remove('hidden');
+                rematchBtn.innerText = "REMATCH";
+                rematchBtn.disabled = false;
+            } else {
+                rematchBtn.classList.add('hidden');
+            }
             if(winner === 'player') {
                 title.innerHTML = "<span class='text-glow-green'>YOU WIN!</span>";
             } else {
@@ -1380,6 +1444,7 @@
             };
             
             isAnimating = false;
+            saveMatchStats(winner, '1v1');
             showScreen('screen-result');
         }
         // LOBBY HELPER FUNCTIONS
@@ -1422,6 +1487,7 @@
         // ==========================================
 
         function start2v2Game() {
+            matchConcluded = false; // Added this!
             buildControls2v2();
             updateHUD2v2();
             showScreen('screen-game-2v2');
@@ -1599,6 +1665,8 @@
             document.getElementById('res-cpu-score').innerText = gameState2v2.score.team_2;
             document.getElementById('res-name-you').innerText = lobbyTeams.team_1.name;
             document.getElementById('res-name-opp').innerText = lobbyTeams.team_2.name;
+            
+            document.getElementById('result-btn-rematch').classList.add('hidden'); // Added this!
 
             const btn = document.getElementById('result-btn');
             btn.innerText = "START SECOND INNINGS";
@@ -1611,9 +1679,17 @@
         }
 
         function endMatch2v2(winnerTeamId) {
+            matchConcluded = true; 
             clearAllTimers();
             const title = document.getElementById('result-title');
-            
+            const rematchBtn = document.getElementById('result-btn-rematch');
+            if (isOnlineMode) {
+                rematchBtn.classList.remove('hidden');
+                rematchBtn.innerText = "REMATCH";
+                rematchBtn.disabled = false;
+            } else {
+                rematchBtn.classList.add('hidden');
+            }
             if (winnerTeamId === 'tie') {
                 title.innerHTML = "<span class='text-yellow-400'>MATCH TIED!</span>";
             } else {
@@ -1636,7 +1712,160 @@
             };
 
             isAnimating = false;
+            // NEW: Fire the 2v2 stats to the database!
+            saveMatchStats2v2(winnerTeamId);
             showScreen('screen-result');
+        }
+        function requestRematch() {
+            const btn = document.getElementById('result-btn-rematch');
+            btn.innerText = "WAITING...";
+            btn.disabled = true;
+            
+            // Set a 10-second timeout. If the other player doesn't accept, cancel.
+            setTimeout(() => {
+                if (matchConcluded) { // If still on the result screen after 10s
+                    btn.innerText = "REMATCH FAILED";
+                }
+            }, 10000);
+
+            sendMessageToServer("rematch_request", {});
+        }
+        let currentUser = null;
+
+        // This instantly checks if they are logged in when the page loads
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session) {
+                currentUser = session.user;
+                
+                // Get their Google name (or fallback to email prefix), make it uppercase & max 12 chars
+                const fullName = currentUser.user_metadata.full_name || currentUser.email.split('@')[0];
+                myName = fullName.toUpperCase().substring(0, 12);
+
+                // Swap the UI
+                document.getElementById('btn-google-login').classList.add('hidden');
+                document.getElementById('playerNameInput').classList.add('hidden');
+                document.getElementById('user-profile-display').classList.remove('hidden');
+                document.getElementById('display-player-name').innerText = myName;
+
+                // Create their database profile (if it doesn't already exist)
+                const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .select('user_id')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (!data) {
+                    // New player! Insert them into the DB
+                    await supabaseClient.from('profiles').insert([{ 
+                        user_id: currentUser.id,
+                        username: myName
+                    }]);
+                }
+            }
+        });
+
+        // Simple logout function
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            location.reload(); // Refresh the page to reset the UI
+        }
+        // --- DATABASE TRACKER ---
+        async function saveMatchStats(isWin, modeType = '1v1') {
+            if (!currentUser) return; // Guests don't get stats saved
+
+            const myRuns = gameState.scores.player;
+            let winnerName = isWin === 'player' ? myName : oppName;
+            if (isWin === 'tie') winnerName = 'TIE';
+
+            try {
+                // 1. Fetch current lifetime stats
+                const { data: profile } = await supabaseClient
+                    .from('profiles')
+                    .select('lifetime_runs, matches_played')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                // 2. Update lifetime runs & match count
+                if (profile) {
+                    await supabaseClient.from('profiles')
+                        .update({
+                            lifetime_runs: profile.lifetime_runs + myRuns,
+                            matches_played: profile.matches_played + 1
+                        })
+                        .eq('user_id', currentUser.id);
+                }
+
+                // 3. Save to Match History
+                await supabaseClient.from('match_history').insert([{
+                    mode: modeType,
+                    team_1_name: myName,
+                    team_2_name: oppName,
+                    team_1_score: myRuns.toString(),
+                    team_2_score: gameState.scores.cpu.toString(),
+                    winner: winnerName
+                }]);
+
+                console.log("Stats successfully synced to Supabase!");
+
+            } catch (err) {
+                console.error("Database sync failed:", err);
+            }
+        }
+        // --- 2V2 DATABASE TRACKER ---
+        async function saveMatchStats2v2(winnerTeamId) {
+            if (!currentUser) return; 
+
+            // Figure out which team the current player belongs to
+            let myTeamId = null;
+            let oppTeamId = null;
+            
+            if (lobbyTeams.team_1.players.some(p => p && p.id === myPlayerId)) {
+                myTeamId = 'team_1';
+                oppTeamId = 'team_2';
+            } else if (lobbyTeams.team_2.players.some(p => p && p.id === myPlayerId)) {
+                myTeamId = 'team_2';
+                oppTeamId = 'team_1';
+            }
+
+            if (!myTeamId) return; // Player is just spectating, don't save stats
+
+            const myTeamScore = gameState2v2.score[myTeamId];
+            const oppTeamScore = gameState2v2.score[oppTeamId];
+            const myTeamName = lobbyTeams[myTeamId].name;
+            const oppTeamName = lobbyTeams[oppTeamId].name;
+
+            let winnerName = 'TIE';
+            if (winnerTeamId !== 'tie') winnerName = lobbyTeams[winnerTeamId].name;
+
+            try {
+                const { data: profile } = await supabaseClient
+                    .from('profiles')
+                    .select('lifetime_runs, matches_played')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (profile) {
+                    await supabaseClient.from('profiles')
+                        .update({
+                            lifetime_runs: profile.lifetime_runs + myTeamScore, // Adding the whole team's runs to lifetime
+                            matches_played: profile.matches_played + 1
+                        })
+                        .eq('user_id', currentUser.id);
+                }
+
+                await supabaseClient.from('match_history').insert([{
+                    mode: '2v2',
+                    team_1_name: myTeamName,
+                    team_2_name: oppTeamName,
+                    team_1_score: `${myTeamScore}/${gameState2v2.wickets[myTeamId]}`,
+                    team_2_score: `${oppTeamScore}/${gameState2v2.wickets[oppTeamId]}`,
+                    winner: winnerName
+                }]);
+
+                console.log("2v2 Stats successfully synced to Supabase!");
+            } catch (err) {
+                console.error("2v2 Database sync failed:", err);
+            }
         }
     </script>
 </body>
