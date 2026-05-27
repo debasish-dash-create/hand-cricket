@@ -596,20 +596,27 @@
         }
 
         // --- GOOGLE LOGIN ACTION ---
+        // --- GOOGLE LOGIN ACTION ---
         async function loginWithGoogle() {
             const btn = document.getElementById('btn-google-login');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> CONNECTING...';
             
-            const { data, error } = await supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: 'https://hand-cricket-api.onrender.com'
-                }
-            });
+            try {
+                // Dynamically build the exact current URL (handles GitHub Pages subfolders safely)
+                const currentUrl = window.location.origin + window.location.pathname;
 
-            if (error) {
-                console.error("Login error:", error.message);
-                showToast("Login failed. Try again.");
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: currentUrl
+                    }
+                });
+
+                if (error) throw error;
+                
+            } catch (err) {
+                console.error("Login Error:", err);
+                showToast("Connection blocked. Check console.");
                 btn.innerHTML = '<i class="fa-brands fa-google text-red-500 text-lg"></i> LOGIN WITH GOOGLE';
             }
         }
