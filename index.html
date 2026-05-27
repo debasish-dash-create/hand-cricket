@@ -1893,7 +1893,7 @@
             const { data, error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin
+                    redirectTo: 'https://hand-cricket-api.onrender.com'
                 }
             });
 
