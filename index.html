@@ -553,6 +553,66 @@
 
     <script>
         let isIntentionalDisconnect = false;
+        // --- SUPABASE SETUP ---
+        const SUPABASE_URL = 'https://hjtdvmvsblqjchwssnqd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqdGR2bXZzYmxxamNod3NzbnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MDU4MzcsImV4cCI6MjA5NTM4MTgzN30.UFzCiZHFTCjV_N_J9byg9agRpwfF13pwQev8AgPrY60'; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- NEW: LISTEN FOR LOGIN SUCCESS ---
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                handleLoginSuccess(session.user);
+            }
+        });
+
+        // Check if the user is already logged in when the page reloads
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                handleLoginSuccess(session.user);
+            }
+        });
+
+        function handleLoginSuccess(user) {
+            // Extract the first name from Google metadata
+            const fullName = user.user_metadata.full_name || "PLAYER";
+            const firstName = fullName.split(' ')[0].toUpperCase();
+            
+            // Hide the Google Login Button completely
+            const btn = document.getElementById('btn-google-login');
+            if (btn) btn.style.display = 'none';
+            
+            // Auto-fill the Guest input field and lock it down (make it glow green)
+            const nameInput = document.getElementById('playerNameInput');
+            if (nameInput) {
+                nameInput.value = firstName;
+                nameInput.disabled = true; // Lock the input
+                nameInput.classList.remove('border-cyan-500', 'text-cyan-400');
+                nameInput.classList.add('border-green-500', 'text-green-400', 'shadow-[0_0_15px_rgba(57,255,20,0.4)]');
+            }
+            
+            // Set the global game variable so your multiplayer matches use this name
+            myName = firstName; 
+            showToast("LOGGED IN AS " + firstName);
+        }
+
+        // --- GOOGLE LOGIN ACTION ---
+        async function loginWithGoogle() {
+            const btn = document.getElementById('btn-google-login');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> CONNECTING...';
+            
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: 'https://hand-cricket-api.onrender.com'
+                }
+            });
+
+            if (error) {
+                console.error("Login error:", error.message);
+                showToast("Login failed. Try again.");
+                btn.innerHTML = '<i class="fa-brands fa-google text-red-500 text-lg"></i> LOGIN WITH GOOGLE';
+            }
+        }
         const body = document.body;
         const screens = document.querySelectorAll('.screen');
         const bigMessage = document.getElementById('big-message');
@@ -1843,66 +1903,7 @@
                 console.error("2v2 Database sync failed:", err);
             }
         }
-        // --- SUPABASE SETUP ---
-        const SUPABASE_URL = 'https://hjtdvmvsblqjchwssnqd.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqdGR2bXZzYmxxamNod3NzbnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MDU4MzcsImV4cCI6MjA5NTM4MTgzN30.UFzCiZHFTCjV_N_J9byg9agRpwfF13pwQev8AgPrY60'; 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // --- NEW: LISTEN FOR LOGIN SUCCESS ---
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' && session) {
-                handleLoginSuccess(session.user);
-            }
-        });
-
-        // Check if the user is already logged in when the page reloads
-        supabaseClient.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                handleLoginSuccess(session.user);
-            }
-        });
-
-        function handleLoginSuccess(user) {
-            // Extract the first name from Google metadata
-            const fullName = user.user_metadata.full_name || "PLAYER";
-            const firstName = fullName.split(' ')[0].toUpperCase();
-            
-            // Hide the Google Login Button completely
-            const btn = document.getElementById('btn-google-login');
-            if (btn) btn.style.display = 'none';
-            
-            // Auto-fill the Guest input field and lock it down (make it glow green)
-            const nameInput = document.getElementById('playerNameInput');
-            if (nameInput) {
-                nameInput.value = firstName;
-                nameInput.disabled = true; // Lock the input
-                nameInput.classList.remove('border-cyan-500', 'text-cyan-400');
-                nameInput.classList.add('border-green-500', 'text-green-400', 'shadow-[0_0_15px_rgba(57,255,20,0.4)]');
-            }
-            
-            // Set the global game variable so your multiplayer matches use this name
-            myName = firstName; 
-            showToast("LOGGED IN AS " + firstName);
-        }
-
-        // --- GOOGLE LOGIN ACTION ---
-        async function loginWithGoogle() {
-            const btn = document.getElementById('btn-google-login');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> CONNECTING...';
-            
-            const { data, error } = await supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: 'https://hand-cricket-api.onrender.com'
-                }
-            });
-
-            if (error) {
-                console.error("Login error:", error.message);
-                showToast("Login failed. Try again.");
-                btn.innerHTML = '<i class="fa-brands fa-google text-red-500 text-lg"></i> LOGIN WITH GOOGLE';
-            }
-        }
+        
     </script>
 </body>
 </html>
